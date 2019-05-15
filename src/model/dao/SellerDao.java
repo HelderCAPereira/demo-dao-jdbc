@@ -7,15 +7,16 @@ package model.dao;
 
 import java.util.List;
 import model_entities.Department;
+import model_entities.Seller;
 
 /**
  *
  * @author helder
  */
 public interface SellerDao {
-    void insert(Department obj);
-    void update(Department obj);
+    void insert(Seller obj);
+    void update(Seller obj);
     void deleteById(Integer id);
-    Department findById(Integer id);
-    List<Department> findAll();
+    Seller findById(Integer id);
+    List<Seller> findAll();
 }
