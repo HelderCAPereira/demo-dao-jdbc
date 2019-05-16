@@ -3,18 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package model.dao;
+package model.dao.impl;
 
-
-import model.dao.impl.SellerDaoJDBC;
-import db.DB;
 /**
  *
  * @author helder
  */
-public class DaoFactory {
-    public static SellerDao createSellerDao(){
-        return new SellerDaoJDBC(DB.getConnection());
-    }
+public class DBException {
     
 }
