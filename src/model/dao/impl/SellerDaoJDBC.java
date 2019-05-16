@@ -16,6 +16,9 @@ import model_entities.Department;
 import model_entities.Seller;
 import db.DbException;
 import db.DB;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -111,6 +114,59 @@ public class SellerDaoJDBC implements SellerDao{
         obj.setBirthDate(rs.getDate("BirthDate"));
         obj.setDepartment(dep); //a associação aqui é por objeto e não por campo
         return obj;
+    }
+
+    @Override
+    public List<Seller> findByDepartment(Department department) {
+       PreparedStatement st = null; // isso é um framework
+        ResultSet rs = null; //isso é um framework
+        
+        try{
+            /*
+            Inserção de um comando sql
+            No caso estamos selecinando todos os campos da tabela seller e o campo
+            Name da tabela department que na nova tabela será chamada gerada DepName
+            A ligação entre as tableas seller e department será via o campo Id
+            No caso a linha que quero obter é aquela que estou informando como 
+            uma ?
+            st.getInt(1,id) - estou falando que o ? vale 1
+            */
+            st = conn.prepareStatement(
+                    "Select seller.*, department.Name as DepName "
+                    +"from seller inner join department "
+                    +"on seller.Department = department.Id "
+                    +"where Department = ? " 
+                    + "order by name");
+            st.setInt(1, department.getId());
+
+            //Esse resultado vem para mim na forma de tabela e preciso
+            //representá-lo na forma de objeto
+            rs = st.executeQuery();
+            List <Seller> list = new ArrayList<>();
+            Map<Integer, Department> map = new HashMap<>();
+            
+
+            //uso esse if para ver se veio algum dado da minha consulta
+            while(rs.next()){
+                //Havendo dados retornados eu estou criando um objeto
+                //e atribuindo dados para o objeto
+                Department dep = map.get(rs.getInt("Department"));
+                if(dep == null){
+                    dep = instantiateDepartment(rs);
+                    map.put(rs.getInt("Department"), dep);
+                }
+                
+                Seller obj = instantiateSeller(rs, dep);
+                list.add(obj);    
+            }
+            return list;
+            
+        }catch(SQLException e){
+            throw new DbException(e.getMessage()); //fazendo minha mensagem personalizada
+        }finally{
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
+        } 
     }
     
 }
