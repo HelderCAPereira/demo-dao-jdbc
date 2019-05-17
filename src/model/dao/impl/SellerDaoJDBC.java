@@ -16,6 +16,7 @@ import model_entities.Department;
 import model_entities.Seller;
 import db.DbException;
 import db.DB;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,9 +32,63 @@ public class SellerDaoJDBC implements SellerDao{
     public SellerDaoJDBC(Connection conn){
         this.conn = conn;
     }
+    
+    //método apra inserção de dados no banco de dados
     @Override
     public void insert(Seller obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        /*
+        PreparedStatement st - cria um objeto para armazenar uma instrução sql
+        */
+        PreparedStatement st = null; 
+        
+        
+        try{
+            /*
+            digita uma operação sql para inserção de um dado na tabela seller
+            e pede para retornar a chave gerada na tabela da nova inserção
+            */
+            st = conn.prepareStatement("insert into seller "
+                + "(Name, Email, BirthDate, BaseSalary, Department) "
+                + "values "
+                + "(?, ?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            
+            st.setString(1, obj.getName());
+            st.setString(2, obj.getEmail());
+            
+            /*
+            Estou falando que o terceiro interrogação é para substituir por um date
+            gettime() retorna o número em milissegundos desde 1970
+            
+            */
+            st.setDate(3, new java.sql.Date(obj.getBirthDate().getTime()));
+            st.setDouble(4, obj.getBaseSalary());
+            st.setInt(5, obj.getDepartment().getId());
+            
+            //Essa linha executa a instrução sql e retorna o código que se maior
+            //que zero foi feita uma inserção com sucesso
+            int rowsAffected = st.executeUpdate();
+            
+            if(rowsAffected > 0){
+                
+                //esse comando resulta na obtenção da linha que foi inserida
+                ResultSet rs = st.getGeneratedKeys();
+                if(rs.next()){
+                    int id = rs.getInt(1);
+                    obj.setId(id);
+                }
+                DB.closeResultSet(rs);
+            }else{
+                throw new DbException("Unexpected error! No rows affected!");
+            }
+            
+        }catch(SQLException e){
+            throw new DbException(e.getMessage());
+        }
+        finally{
+            DB.closeStatement(st);
+            
+        }
     }
 
     @Override
