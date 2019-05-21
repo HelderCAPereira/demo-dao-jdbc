@@ -93,7 +93,46 @@ public class SellerDaoJDBC implements SellerDao{
 
     @Override
     public void update(Seller obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       /*
+        PreparedStatement st - cria um objeto para armazenar uma instrução sql
+        */
+        PreparedStatement st = null; 
+        
+        
+        try{
+            /*
+            digita uma operação sql para inserção de um dado na tabela seller
+            e pede para retornar a chave gerada na tabela da nova inserção
+            */
+            st = conn.prepareStatement(
+                "update seller "
+                + " set Name = ?, Email = ?, BirthDate =?, BaseSalary =?, Department = ? "
+                + "where id = ?");
+                   
+            
+            st.setString(1, obj.getName());
+            st.setString(2, obj.getEmail());
+            
+            /*
+            Estou falando que o terceiro interrogação é para substituir por um date
+            gettime() retorna o número em milissegundos desde 1970
+            
+            */
+            st.setDate(3, new java.sql.Date(obj.getBirthDate().getTime()));
+            st.setDouble(4, obj.getBaseSalary());
+            st.setInt(5, obj.getDepartment().getId());
+            st.setInt(6, obj.getId());
+            
+
+            st.executeUpdate();
+            
+        }catch(SQLException e){
+            throw new DbException(e.getMessage());
+        }
+        finally{
+            DB.closeStatement(st);
+            
+        }        
     }
 
     @Override
