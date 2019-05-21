@@ -50,10 +50,14 @@ public class Program {
         System.out.println("Inserted! New id = " + newSeller.getId());
         
         System.out.println("=== TEST 5: seller udate ===");
-        seller = sellerDao.findById(1);
+        seller = sellerDao.findById(2);
         seller.setName("Martha Waine");
         sellerDao.update(seller);
         System.out.println("Update Completed");
+        
+        System.out.println("=== TEST 6: seller delete ===");
+        sellerDao.deleteById(20);
+        System.out.println("Delete Completed");
     }  
     
 }
